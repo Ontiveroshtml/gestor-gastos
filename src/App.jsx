@@ -6,10 +6,11 @@ function App() {
   const [description, setDescription] = useState("");
   const [selectType, setSelectType] = useState("");
   const [costs, setCosts] = useState([]);
+  const [error, setError] = useState("");
 
   const addCost = () => {
-    if (!money || !selectType) return;
-
+    if (!selectType) return setError("Selecciona el tipo de pago");
+    if (!Number(money)) return setError("Ingresa una cantidad");
     const date = new Date(Date.now()).toLocaleDateString("es-MX");
 
     const obj = {
@@ -24,14 +25,42 @@ function App() {
     setSelectType("");
     setMoney("");
     setDescription("");
+    setError("");
   };
+
+  const totalIngresos = costs
+    .filter((cost) => cost.type === "INGRESO")
+    .reduce((acc, cost) => acc + Number(cost.quantity), 0);
+
+  const totalGastos = costs
+    .filter((cost) => cost.type === "GASTO")
+    .reduce((acc, cost) => acc + Number(cost.quantity), 0);
+
+  const total = totalIngresos - totalGastos;
 
   return (
     <main>
-      <section className="flex flex-col gap-8 pt-16 items-center mx-auto">
+      <section className="flex flex-col gap-8 pt-16 items-center mx-auto max-w-2xl">
         <h1 className="text-white text-4xl font-bold">Gestor de gastos</h1>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-3 w-full justify-between gap-6">
+          <div className="bg-green-900 text-white p-4 font-medium rounded-md ">
+            <h4>Ingresos</h4>
+            <span>{totalIngresos}</span>
+          </div>
+
+          <div className="bg-red-900 text-white p-4 font-medium rounded-md">
+            <h4>Gastos</h4>
+            <span>{totalGastos}</span>
+          </div>
+
+          <div className="bg-red-900 text-white p-4 font-medium rounded-md">
+            <h4>Total</h4>
+            <span>{total}</span>
+          </div>
+        </div>
+
+        <div className="flex gap-3 w-full justify-between">
           <select
             value={selectType}
             onChange={(e) => setSelectType(e.target.value)}
@@ -64,8 +93,9 @@ function App() {
             Agregar
           </button>
         </div>
+        <span className="text-red-900 -mb-5 -mt-5">{error}</span>
 
-        <article className="flex flex-col gap-6 text-white font-medium">
+        <article className="flex flex-col gap-6 text-white font-medium pb-8">
           {costs.map((cost) => (
             <div
               key={cost.id}
@@ -81,7 +111,10 @@ function App() {
               </div>
 
               <div className="flex justify-between">
-                <p>description: {!cost.descriptions ? 'Sin descipcion': cost.descriptions} </p>
+                <p>
+                  descripcion:{" "}
+                  {!cost.descriptions ? "Sin descipcion" : cost.descriptions}
+                </p>
                 <span className="text-end">{cost.date}</span>
               </div>
             </div>
