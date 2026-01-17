@@ -9,6 +9,7 @@ function App() {
   const [costs, setCosts] = useLocalStorage("cost", []);
   const [error, setError] = useState("");
   const [filtered, setFiltered] = useLocalStorage("filter", "todos");
+  const [showModal, setShowModal] = useState(null);
 
   const addCost = () => {
     if (!selectType) return setError("Selecciona el tipo de pago");
@@ -28,6 +29,10 @@ function App() {
     setMoney("");
     setDescription("");
     setError("");
+  };
+
+  const isShowed = (id) => {
+    setShowModal(id);
   };
 
   const borrar = (id) => {
@@ -157,7 +162,39 @@ function App() {
                       </p>
                       <span className="text-end">{cost.date}</span>
                     </div>
-                    <button onClick={() => borrar(cost.id)}>borrar</button>
+
+                    <div>
+                      {showModal === cost.id ? (
+                        <div className="flex flex-col gap-8 text-center bg-slate-800 p-4 rounded-xl">
+                          <p>
+                            Seguro que quieres eliminar el {cost.type} de $
+                            {cost.quantity}?
+                          </p>
+
+                          <div className="flex justify-around">
+                            <button
+                              onClick={() => borrar(cost.id)}
+                              className="bg-yellow-600 p-2 rounded-md cursor-pointer hover:bg-yellow-700"
+                            >
+                              Si, eliminar
+                            </button>
+                            <button
+                              onClick={() => setShowModal(null)}
+                              className="bg-cyan-800 p-2 rounded-md cursor-pointer hover:bg-cyan-900"
+                            >
+                              No, Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 justify-end">
+                          <button className="bg-cyan-800 p-2 rounded-md cursor-pointer hover:bg-cyan-900">Editar</button>
+                          <button onClick={() => isShowed(cost.id)} className="bg-cyan-800 p-2 rounded-md cursor-pointer hover:bg-cyan-900">
+                            Eliminar
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </>
