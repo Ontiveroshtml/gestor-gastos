@@ -6,8 +6,13 @@ import { Forms } from "./components/forms/Forms";
 import { AddCostButton } from "./components/forms/button/AddCostButton";
 import { Filters } from "./components/filters/Filters";
 import { RenderCosts } from "./components/costs/RenderCosts";
+import { useEffect } from "react";
 
 function App() {
+  const getToday = () => {
+    return new Date().toLocaleDateString("es-MX");
+  };
+
   const [money, setMoney] = useState("");
   const [description, setDescription] = useState("");
   const [selectType, setSelectType] = useState("");
@@ -17,18 +22,22 @@ function App() {
   const [filtered, setFiltered] = useLocalStorage("filter", "todos");
   const [showModal, setShowModal] = useState(null);
 
+  const [lastSavedDate, setLastSavedDate] = useLocalStorage(
+    "lastdate",
+    getToday(),
+  );
+  const [saved, setSaved] = useLocalStorage("saved", []);
+
   const addCost = () => {
     if (!selectType) return setError("Selecciona el tipo de pago");
     if (!Number(money)) return setError("Ingresa una cantidad");
 
-    const date = new Date(Date.now()).toLocaleDateString("es-MX");
-
     const obj = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       quantity: Number(money).toFixed(2),
       descriptions: description,
       type: selectType,
-      date: date,
+      date: getToday(),
     };
     setCosts((prev) => [...prev, obj]);
 
@@ -37,12 +46,11 @@ function App() {
     setDescription("");
     setError("");
 
+    setSuccesful("Monto agregado correctamente");
+
     setTimeout(() => {
       setSuccesful("");
     }, 3000);
-
-    if (Number(money) && selectType)
-      return setSuccesful("Monto agregado correctamente");
   };
 
   const isShowed = (id) => {
@@ -59,9 +67,46 @@ function App() {
     return true;
   });
 
+  const totalIngresos = costs
+    .filter((cost) => cost.type === "ingreso")
+    .reduce((acc, cost) => acc + Number(cost.quantity), 0);
+
+  const totalGastos = costs
+    .filter((cost) => cost.type === "gasto")
+    .reduce((acc, cost) => acc + Number(cost.quantity), 0);
+
+  const total = totalIngresos - totalGastos;
+
+  const today = getToday();
+
+  const showTodayTotals = today === today
+
+  const displayIngresos = showTodayTotals ? totalIngresos : 0
+  const displayGastos = showTodayTotals ? totalGastos : 0
+  const displayTotal = showTodayTotals ? total : 0
+
+  useEffect(() => {
+    const today = getToday();
+
+    if (today !== lastSavedDate && costs.length > 0) {
+      setSaved((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), total, fecha: lastSavedDate },
+      ]);
+
+      setLastSavedDate(today);
+    }
+  }, [costs, total, lastSavedDate]);
+
   return (
     <main>
-      <TotalCost cost={costs} />
+      <TotalCost
+        totalIngresos={displayIngresos}
+        totalGastos={displayGastos}
+        total={displayTotal}
+        lastTotal={saved[saved.length - 1]?.total}
+        lastSavedDate={lastSavedDate}
+      />
 
       <section className="flex flex-col gap-8 p-3 items-center mx-auto max-w-4xl ">
         <div className="flex flex-col gap-3 w-full justify-between md:flex-row">

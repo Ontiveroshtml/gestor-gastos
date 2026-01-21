@@ -11,6 +11,7 @@ export function RenderCosts({
     <>
       {[...filteredCost].reverse().map((cost) => (
         <Items
+          key={cost.id}
           cost={cost}
           onShowModal={onShowModal}
           onDelete={onDelete}

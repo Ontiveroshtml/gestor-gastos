@@ -9,7 +9,6 @@ export default function Items({
 }) {
   return (
     <div
-      key={cost.id}
       className={
         cost.type === "ingreso"
           ? "flex flex-col gap-6 p-6 rounded-lg bg-green-900 w-full"
