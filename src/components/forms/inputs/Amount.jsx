@@ -3,7 +3,7 @@ import React from "react";
 export function Amount({money, setMoney}) {
   return (
     <input
-      className="bg-white rounded-md p-[0.3rem] text-black"
+      className="bg-white rounded-md w-full p-3 text-black"
       placeholder="Monto"
       type="number"
       step="0.01"

@@ -13,12 +13,14 @@ function App() {
   const [selectType, setSelectType] = useState("");
   const [costs, setCosts] = useLocalStorage("cost", []);
   const [error, setError] = useState("");
+  const [succesful, setSuccesful] = useState("");
   const [filtered, setFiltered] = useLocalStorage("filter", "todos");
   const [showModal, setShowModal] = useState(null);
 
   const addCost = () => {
     if (!selectType) return setError("Selecciona el tipo de pago");
     if (!Number(money)) return setError("Ingresa una cantidad");
+
     const date = new Date(Date.now()).toLocaleDateString("es-MX");
 
     const obj = {
@@ -34,6 +36,13 @@ function App() {
     setMoney("");
     setDescription("");
     setError("");
+
+    setTimeout(() => {
+      setSuccesful("");
+    }, 3000);
+
+    if (Number(money) && selectType)
+      return setSuccesful("Monto agregado correctamente");
   };
 
   const isShowed = (id) => {
@@ -54,8 +63,8 @@ function App() {
     <main>
       <TotalCost cost={costs} />
 
-      <section className="flex flex-col gap-8 pt-10 items-center mx-auto max-w-2xl pb-10">
-        <div className="flex gap-3 w-full justify-between">
+      <section className="flex flex-col gap-8 p-3 items-center mx-auto max-w-4xl ">
+        <div className="flex flex-col gap-3 w-full justify-between md:flex-row">
           <Forms
             type={selectType}
             setSelectType={setSelectType}
@@ -67,7 +76,13 @@ function App() {
 
           <AddCostButton onAddCost={addCost} />
         </div>
-        <span className="text-red-900 -mb-5 -mt-5 font-medium">{error}</span>
+        {error ? (
+          <span className="text-red-900 -mb-5 -mt-5 font-medium">{error}</span>
+        ) : (
+          <span className="text-green-500 -mb-5 -mt-5 font-medium">
+            {succesful}
+          </span>
+        )}
 
         <article className="flex flex-col gap-4 text-white font-medium p-6 bg-slate-700 w-full h-auto rounded-xl">
           <div className="flex gap-8">

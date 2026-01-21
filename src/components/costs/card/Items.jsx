@@ -12,8 +12,8 @@ export default function Items({
       key={cost.id}
       className={
         cost.type === "ingreso"
-          ? "flex flex-col gap-6 p-6 rounded-lg bg-green-900 w-xl"
-          : "flex flex-col gap-6 p-6 rounded-lg bg-red-900 w-xl"
+          ? "flex flex-col gap-6 p-6 rounded-lg bg-green-900 w-full"
+          : "flex flex-col gap-6 p-6 rounded-lg bg-red-900 w-full"
       }
     >
       <Card cost={cost} />
